@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Master</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Flower celebration overlay -->
+    <div class="flower-overlay" id="flowerOverlay"></div>
+    
+    <!-- Toggle Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🎮 Tic-Tac-Toe Master</div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <div class="nav-item" onclick="showSection('game')">🎯 Game</div>
+                <div class="nav-item" onclick="showSection('history')">📜 History</div>
+                <div class="nav-item" onclick="showSection('profile')">👤 Profile</div>
+                <div class="nav-item" onclick="logout()" id="logoutBtn" style="display: none;">🚪 Logout</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Authentication Section -->
+        <section id="authSection" class="section active">
+            <div class="auth-card">
+                <h1>🌟 Welcome to Tic-Tac-Toe Master</h1>
+                <p class="subtitle">Sign in to save your progress and compete with friends!</p>
+                
+                <div class="auth-form">
+                    <div class="form-group">
+                        <label for="email">📧 Email Address</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">👤 Your Name</label>
+                        <input type="text" id="name" placeholder="Enter your name" required>
+                    </div>
+                    <button class="btn btn-primary" onclick="signInWithEmail()">
+                        ✨ Sign In & Play
+                    </button>
+                    <button class="btn btn-secondary" onclick="playAsGuest()">
+                        🎲 Play as Guest
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Section -->
+        <section id="gameSection" class="section">
+            <div class="game-card">
+                <div class="game-header">
+                    <h2>🎯 Game Arena</h2>
+                    <div class="player-info">
+                        Welcome, <span id="currentUser">Guest</span>! 🎉
+                    </div>
+                </div>
+
+                <div class="player-setup">
+                    <h3>👥 Player Setup</h3>
+                    <div class="player-inputs">
+                        <div class="player-input">
+                            <label>Player 1 (❌)</label>
+                            <input type="text" id="player1Name" placeholder="Player 1" onchange="updatePlayerNames()">
+                        </div>
+                        <div class="player-input">
+                            <label>Player 2 (⭕)</label>
+                            <input type="text" id="player2Name" placeholder="Player 2" onchange="updatePlayerNames()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-mode">
+                    <h3>🎮 Game Mode</h3>
+                    <button class="mode-btn active" onclick="setGameMode('player')" id="playerMode">
+                        👫 vs Player
+                    </button>
+                    <button class="mode-btn" onclick="setGameMode('computer')" id="computerMode">
+                        🤖 vs Computer
+                    </button>
+                </div>
+
+                <div class="current-player" id="currentPlayerDisplay">
+                    Current Player: ❌ Player 1
+                </div>
+
+                <div class="game-board" id="gameBoard">
+                    <button class="cell" onclick="makeMove(0)" data-index="0"></button>
+                    <button class="cell" onclick="makeMove(1)" data-index="1"></button>
+                    <button class="cell" onclick="makeMove(2)" data-index="2"></button>
+                    <button class="cell" onclick="makeMove(3)" data-index="3"></button>
+                    <button class="cell" onclick="makeMove(4)" data-index="4"></button>
+                    <button class="cell" onclick="makeMove(5)" data-index="5"></button>
+                    <button class="cell" onclick="makeMove(6)" data-index="6"></button>
+                    <button class="cell" onclick="makeMove(7)" data-index="7"></button>
+                    <button class="cell" onclick="makeMove(8)" data-index="8"></button>
+                </div>
+
+                <div id="gameMessage"></div>
+
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="resetGame()">🔄 New Game</button>
+                    <button class="btn btn-secondary" onclick="undoMove()">↩️ Undo</button>
+                </div>
+
+                <div class="score-board">
+                    <div class="score-item wins">
+                        <div class="score-icon">🏆</div>
+                        <div class="score-label">Wins</div>
+                        <div class="score-value" id="wins">0</div>
+                    </div>
+                    <div class="score-item draws">
+                        <div class="score-icon">🤝</div>
+                        <div class="score-label">Draws</div>
+                        <div class="score-value" id="draws">0</div>
+                    </div>
+                    <div class="score-item losses">
+                        <div class="score-icon">😔</div>
+                        <div class="score-label">Losses</div>
+                        <div class="score-value" id="losses">0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="historySection" class="section">
+            <div class="history-card">
+                <div class="history-header">
+                    <h2>📜 Game History</h2>
+                    <button class="btn btn-secondary" onclick="clearHistory()">🗑️ Clear All</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="loading">Loading history...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profileSection" class="section">
+            <div class="profile-card">
+                <h2>👤 Player Profile</h2>
+                <div class="profile-info">
+                    <div class="profile-avatar">🎮</div>
+                    <div class="profile-details">
+                        <h3 id="profileName">Guest Player</h3>
+                        <p id="profileEmail">guest@example.com</p>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <h3>📊 Overall Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalGames">0</div>
+                            <div class="stat-label">Total Games</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="winRate">0%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="bestStreak">0</div>
+                            <div class="stat-label">Best Streak</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Winner Modal -->
+    <div class="modal" id="winnerModal">
+        <div class="modal-content">
+            <div class="winner-animation">
+                <div class="trophy">🏆</div>
+                <h2 id="winnerText">🎉 Player Wins!</h2>
+                <p id="winnerSubtext">Congratulations on your victory!</p>
+                <button class="btn btn-primary" onclick="closeWinnerModal()">🎮 Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
