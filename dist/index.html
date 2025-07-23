@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Tic-Tac-Toe Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: rgba(66, 50, 50, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+                    backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            margin: 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .auth-container {
+            text-align: center;
+        }
+
+        .auth-container h2 {
+            margin-bottom: 2rem;
+            color: #4a5568;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        }
+
+        .btn-guest {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .divider {
+            margin: 1.5rem 0;
+            text-align: center;
+            position: relative;
+            color: #718096;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0 1rem;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .user-info {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .player-setup {
+            margin-bottom: 2rem;
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .player-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .player-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .player-input label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .player-input input {
+            padding: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 2rem auto;
+            background: #4a5568;
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .cell {
+            background: white;
+            border: none;
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cell:hover:not(.taken) {
+            background: #f7fafc;
+            transform: scale(1.05);
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+        }
+
+        .cell.x {
+            color: #e53e3e;
+        }
+
+        .cell.o {
+            color: #3182ce;
+        }
+
+        .cell.winning {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        .game-info {
+            margin: 2rem 0;
+        }
+
+        .current-player {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        .game-mode {
+            margin-bottom: 2rem;
+        }
+
+        .mode-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: 2px solid transparent;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .score-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .score-item {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .score-item h3 {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-item .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .history-container {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .game-result {
+            font-weight: 600;
+        }
+
+        .game-result.win {
+            color: #38a169;
+        }
+
+        .game-result.lose {
+            color: #e53e3e;
+        }
+
+        .game-result.draw {
+            color: #d69e2e;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .winner-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .draw-message {
+            background: linear-gradient(135deg, #ed8936 0%, #d69e2e 100%);
+        }
+
+        /* Celebration Animation */
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: fall 3s linear infinite;
+        }
+
+        .confetti:nth-child(odd) {
+            animation-duration: 2.5s;
+        }
+
+        .confetti:nth-child(even) {
+            animation-duration: 3.5s;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
+
+            .player-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .game-board {
+                max-width: 250px;
+            }
+
+            .cell {
+                width: 70px;
+                height: 70px;
+                font-size: 1.5rem;
+            }
+
+            .game-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .difficulty-selector {
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: 2px solid transparent;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin: 0.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #ed8936 0%, #d69e2e 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="celebration-overlay" id="celebrationOverlay"></div>
+    
+    <div class="container">
+        <!-- Authentication Screen -->
+        <div id="authScreen" class="auth-container">
+            <h2>🎮 Tic-Tac-Toe Master</h2>
+            
+            <button class="btn btn-guest" onclick="playAsGuest()">
+                🎲 Play as Guest
+            </button>
+            
+            <div class="divider">
+                <span>or create an account to save progress</span>
+            </div>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn" onclick="signInWithEmail()">Sign In</button>
+                <button class="btn btn-secondary" onclick="showSignup()">Sign Up</button>
+            </div>
+
+            <div id="signupForm" class="hidden">
+                <div class="form-group">
+                    <label for="signupEmail">Email:</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password:</label>
+                    <input type="password" id="signupPassword" placeholder="Choose a password (min 6 characters)">
+                </div>
+                <div class="form-group">
+                    <label for="signupDisplayName">Display Name:</label>
+                    <input type="text" id="signupDisplayName" placeholder="Enter your display name">
+                </div>
+                <button class="btn" onclick="signUpWithEmail()">Create Account</button>
+                <button class="btn btn-secondary" onclick="showLogin()">Back to Sign In</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-container hidden">
+            <div class="game-header">
+                <div class="user-info">
+                    Welcome, <span id="currentUser">Guest</span>! 🎉
+                </div>
+                <button class="btn btn-secondary" onclick="logout()" id="logoutBtn">Logout</button>
+            </div>
+
+            <div class="player-setup">
+                <h3>👥 Player Setup</h3>
+                <div class="player-inputs">
+                    <div class="player-input">
+                        <label for="player1Name">Player 1 (❌):</label>
+                        <input type="text" id="player1Name" placeholder="Enter Player 1 name" onchange="updatePlayerNames()">
+                    </div>
+                    <div class="player-input">
+                        <label for="player2Name">Player 2 (⭕):</label>
+                        <input type="text" id="player2Name" placeholder="Enter Player 2 name" onchange="updatePlayerNames()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-mode">
+                <h3>🎯 Game Mode:</h3>
+                <button class="mode-btn active" onclick="setGameMode('player')" id="playerMode">👫 vs Player</button>
+                <button class="mode-btn" onclick="setGameMode('computer')" id="computerMode">🤖 vs Computer</button>
+                
+                <div class="difficulty-selector" id="difficultySelector" style="display: none;">
+                    <h4>🎚️ Difficulty:</h4>
+                    <button class="difficulty-btn active" onclick="setDifficulty('easy')" id="easyBtn">Easy</button>
+                    <button class="difficulty-btn" onclick="setDifficulty('medium')" id="mediumBtn">Medium</button>
+                    <button class="difficulty-btn" onclick="setDifficulty('hard')" id="hardBtn">Hard</button>
+                </div>
+            </div>
+
+            <div class="current-player" id="currentPlayerDisplay">Current Player: ❌</div>
+            
+            <div class="game-board" id="gameBoard">
+                <button class="cell" onclick="makeMove(0)" data-index="0"></button>
+                <button class="cell" onclick="makeMove(1)" data-index="1"></button>
+                <button class="cell" onclick="makeMove(2)" data-index="2"></button>
+                <button class="cell" onclick="makeMove(3)" data-index="3"></button>
+                <button class="cell" onclick="makeMove(4)" data-index="4"></button>
+                <button class="cell" onclick="makeMove(5)" data-index="5"></button>
+                <button class="cell" onclick="makeMove(6)" data-index="6"></button>
+                <button class="cell" onclick="makeMove(7)" data-index="7"></button>
+                <button class="cell" onclick="makeMove(8)" data-index="8"></button>
+            </div>
+
+            <div id="gameMessage"></div>
+
+            <div class="game-info">
+                <button class="btn" onclick="resetGame()">🔄 New Game</button>
+                <button class="btn btn-secondary" onclick="undoMove()">↩️ Undo</button>
+            </div>
+
+            <div class="score-board">
+                <div class="score-item">
+                    <h3>🏆 Wins</h3>
+                    <div class="score" id="wins">0</div>
+                </div>
+                <div class="score-item">
+                    <h3>🤝 Draws</h3>
+                    <div class="score" id="draws">0</div>
+                </div>
+                <div class="score-item">
+                    <h3>😔 Losses</h3>
+                    <div class="score" id="losses">0</div>
+                </div>
+            </div>
+
+            <div class="history-container">
+                <div class="history-header">
+                    <h3>📜 Game History</h3>
+                    <button class="btn btn-secondary" onclick="clearHistory()">🗑️ Clear History</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <p>No games played yet. Start playing to see your history!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            board: Array(9).fill(''),
+            currentPlayer: 'X',
+            gameMode: 'player',
+            difficulty: 'easy',
+            gameActive: true,
+            isGuest: true,
+            user: null,
+            player1Name: 'Player 1',
+            player2Name: 'Player 2',
+            moveHistory: [],
+            stats: { wins: 0, draws: 0, losses: 0 },
+            games: []
+        };
+
+        // Initialize application
+        function initializeApp() {
+            // Show auth screen initially
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
+        }
+
+        // Authentication functions
+        function playAsGuest() {
+            gameState.isGuest = true;
+            gameState.user = null;
+            document.getElementById('currentUser').textContent = 'Guest';
+            document.getElementById('logoutBtn').textContent = 'Back to Menu';
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            loadGuestData();
+        }
+
+        function showSignup() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        function signUpWithEmail() {
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const displayName = document.getElementById('signupDisplayName').value.trim();
+
+            if (!email || !password || !displayName) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return;
+            }
+
+            // Simulate successful signup
+            gameState.isGuest = false;
+            gameState.user = { email, displayName };
+            document.getElementById('currentUser').textContent = displayName;
+            document.getElementById('logoutBtn').textContent = 'Logout';
+            
+            // Clear form
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('signupDisplayName').value = '';
+            
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            loadUserData();
+        }
+
+        function signInWithEmail() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please enter both email and password.');
+                return;
+            }
+
+            // Simulate successful login
+            gameState.isGuest = false;
+            gameState.user = { email, displayName: email.split('@')[0] };
+            document.getElementById('currentUser').textContent = gameState.user.displayName;
+            document.getElementById('logoutBtn').textContent = 'Logout';
+            
+            // Clear form
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            loadUserData();
+        }
+
+        function logout() {
+            gameState.isGuest = true;
+            gameState.user = null;
+            resetGame();
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('authScreen').classList.remove('hidden');
+        }
+
+        // Data management
+        function loadGuestData() {
+            const savedStats = localStorage.getItem('ttt_guest_stats');
+            const savedGames = localStorage.getItem('ttt_guest_games');
+            
+            if (savedStats) {
+                gameState.stats = JSON.parse(savedStats);
+            }
+            if (savedGames) {
+                gameState.games = JSON.parse(savedGames);
+            }
+            
+            updateStatsDisplay();
+            updateHistoryDisplay();
+        }
+
+        function loadUserData() {
+            const userKey = `ttt_user_${gameState.user.email}`;
+            const savedData = localStorage.getItem(userKey);
+            
+            if (savedData) {
+                const userData = JSON.parse(savedData);
+                gameState.stats = userData.stats || { wins: 0, draws: 0, losses: 0 };
+                gameState.games = userData.games || [];
+            }
+            
+            updateStatsDisplay();
+            updateHistoryDisplay();
+        }
+
+        function saveData() {
+            if (gameState.isGuest) {
+                localStorage.setItem('ttt_guest_stats', JSON.stringify(gameState.stats));
+                localStorage.setItem('ttt_guest_games', JSON.stringify(gameState.games));
+            } else if (gameState.user) {
+                const userKey = `ttt_user_${gameState.user.email}`;
+                const userData = {
+                    stats: gameState.stats,
+                    games: gameState.games
+                };
+                localStorage.setItem(userKey, JSON.stringify(userData));
+            }
+        }
+
+        // Player setup
+        function updatePlayerNames() {
+            const player1Input = document.getElementById('player1Name').value.trim();
+            const player2Input = document.getElementById('player2Name').value.trim();
+            
+            gameState.player1Name = player1Input || 'Player 1';
+            gameState.player2Name = player2Input || 'Player 2';
+            
+            updateCurrentPlayerDisplay();
+        }
+
+        // Game mode and difficulty
+        function setGameMode(mode) {
+            gameState.gameMode = mode;
+            
+            // Update UI
+            document.getElementById('playerMode').classList.toggle('active', mode === 'player');
+            document.getElementById('computerMode').classList.toggle('active', mode === 'computer');
+            
+            // Show/hide difficulty selector
+            const difficultySelector = document.getElementById('difficultySelector');
+            difficultySelector.style.display = mode === 'computer' ? 'block' : 'none';
+            
+            // Update player 2 input based on mode
+            const player2Input = document.getElementById('player2Name');
+            if (mode === 'computer') {
+                player2Input.value = 'Computer';
+                player2Input.disabled = true;
+                gameState.player2Name = 'Computer';
+            } else {
+                player2Input.disabled = false;
+                if (player2Input.value === 'Computer') {
+                    player2Input.value = '';
+                    gameState.player2Name = 'Player 2';
+                }
+            }
+            
+            resetGame();
+        }
+
+        function setDifficulty(difficulty) {
+            gameState.difficulty = difficulty;
+            
+            // Update UI
+            document.getElementById('easyBtn').classList.toggle('active', difficulty === 'easy');
+            document.getElementById('mediumBtn').classList.toggle('active', difficulty === 'medium');
+            document.getElementById('hardBtn').classList.toggle('active', difficulty === 'hard');
+        }
+
+        // Game logic
+        function makeMove(index) {
+            if (!gameState.gameActive || gameState.board[index] !== '') {
+                return;
+            }
+
+            // Save move to history for undo
+            gameState.moveHistory.push({
+                board: [...gameState.board],
+                currentPlayer: gameState.currentPlayer
+            });
+
+            // Make human move
+            gameState.board[index] = gameState.currentPlayer;
+            updateCell(index);
+
+            if (checkWinner()) {
+                endGame();
+                return;
+            }
+
+            if (gameState.gameMode === 'player') {
+                // Switch players in two-player mode
+                gameState.currentPlayer = gameState.currentPlayer === 'X' ? 'O' : 'X';
+                updateCurrentPlayerDisplay();
+            } else {
+                // Computer mode
+                if (gameState.currentPlayer === 'X') {
+                    gameState.currentPlayer = 'O';
+                    updateCurrentPlayerDisplay();
+                    
+                    // Computer makes move after short delay
+                    setTimeout(() => {
+                        makeComputerMove();
+                    }, 500);
+                }
+            }
+        }
+
+        function makeComputerMove() {
+            if (!gameState.gameActive) return;
+
+            let move = findBestMove();
+            
+            if (move !== -1) {
+                // Save move to history
+                gameState.moveHistory.push({
+                    board: [...gameState.board],
+                    currentPlayer: gameState.currentPlayer
+                });
+
+                gameState.board[move] = 'O';
+                updateCell(move);
+
+                if (checkWinner()) {
+                    endGame();
+                    return;
+                }
+
+                gameState.currentPlayer = 'X';
+                updateCurrentPlayerDisplay();
+            }
+        }
+
+        function findBestMove() {
+            const availableMoves = [];
+            for (let i = 0; i < 9; i++) {
+                if (gameState.board[i] === '') {
+                    availableMoves.push(i);
+                }
+            }
+
+            if (availableMoves.length === 0) return -1;
+
+            if (gameState.difficulty === 'easy') {
+                // Easy: 70% random moves, 30% smart moves
+                if (Math.random() < 0.7) {
+                    return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+                }
+            } else if (gameState.difficulty === 'medium') {
+                // Medium: 40% random moves, 60% smart moves
+                if (Math.random() < 0.4) {
+                    return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+                }
+            }
+
+            // Smart moves (used in medium/hard difficulty)
+            
+            // First, try to win
+            for (let i = 0; i < 9; i++) {
+                if (gameState.board[i] === '') {
+                    gameState.board[i] = 'O';
+                    if (checkWinCondition('O')) {
+                        gameState.board[i] = '';
+                        return i;
+                    }
+                    gameState.board[i] = '';
+                }
+            }
+
+            // Then, try to block player
+            for (let i = 0; i < 9; i++) {
+                if (gameState.board[i] === '') {
+                    gameState.board[i] = 'X';
+                    if (checkWinCondition('X')) {
+                        gameState.board[i] = '';
+                        return i;
+                    }
+                    gameState.board[i] = '';
+                }
+            }
+
+            // Take center if available
+            if (gameState.board[4] === '') {
+                return 4;
+            }
+
+            // Take corners
+            const corners = [0, 2, 6, 8];
+            const availableCorners = corners.filter(corner => gameState.board[corner] === '');
+            if (availableCorners.length > 0) {
+                return availableCorners[Math.floor(Math.random() * availableCorners.length)];
+            }
+
+            // Take any available move
+            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        }
+
+        function checkWinner() {
+            const winner = checkWinCondition('X') || checkWinCondition('O');
+            if (winner) {
+                return winner;
+            }
+
+            // Check for draw
+            if (gameState.board.every(cell => cell !== '')) {
+                return 'draw';
+            }
+
+            return false;
+        }
+
+        function checkWinCondition(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6] // diagonals
+            ];
+
+            for (let pattern of winPatterns) {
+                if (pattern.every(index => gameState.board[index] === player)) {
+                    // Highlight winning cells
+                    pattern.forEach(index => {
+                        const cell = document.querySelector(`[data-index="${index}"]`);
+                        cell.classList.add('winning');
+                    });
+                    return player;
+                }
+            }
+            return false;
+        }
+
+        function updateCell(index) {
+            const cell = document.querySelector(`[data-index="${index}"]`);
+            const symbol = gameState.board[index];
+            
+            cell.textContent = symbol === 'X' ? '❌' : '⭕';
+            cell.classList.add(symbol.toLowerCase());
+            cell.classList.add('taken');
+            cell.classList.add('pulse-animation');
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                cell.classList.remove('pulse-animation');
+            }, 500);
+        }
+
+        function updateCurrentPlayerDisplay() {
+            const currentPlayerName = gameState.currentPlayer === 'X' ? gameState.player1Name : gameState.player2Name;
+            const symbol = gameState.currentPlayer === 'X' ? '❌' : '⭕';
+            document.getElementById('currentPlayerDisplay').textContent = `Current Player: ${symbol} ${currentPlayerName}`;
+        }
+
+        function endGame() {
+            gameState.gameActive = false;
+            const winner = checkWinner();
+            const messageElement = document.getElementById('gameMessage');
+            
+            if (winner === 'draw') {
+                messageElement.innerHTML = '<div class="winner-message draw-message">🤝 It\'s a Draw!</div>';
+                gameState.stats.draws++;
+                saveGameToHistory('draw', null);
+                showCelebration('draw');
+            } else {
+                const winnerName = winner === 'X' ? gameState.player1Name : gameState.player2Name;
+                const winnerSymbol = winner === 'X' ? '❌' : '⭕';
+                messageElement.innerHTML = `<div class="winner-message">🎉 ${winnerSymbol} ${winnerName} Wins!</div>`;
+                
+                // Update stats based on game mode
+                if (gameState.gameMode === 'computer') {
+                    if (winner === 'X') {
+                        gameState.stats.wins++;
+                        saveGameToHistory('win', gameState.player1Name);
+                    } else {
+                        gameState.stats.losses++;
+                        saveGameToHistory('lose', gameState.player2Name);
+                    }
+                } else {
+                    // In player vs player, track stats for player 1
+                    if (winner === 'X') {
+                        gameState.stats.wins++;
+                        saveGameToHistory('win', gameState.player1Name);
+                    } else {
+                        gameState.stats.losses++;
+                        saveGameToHistory('lose', gameState.player2Name);
+                    }
+                }
+                
+                showCelebration('win');
+            }
+            
+            updateStatsDisplay();
+            saveData();
+        }
+
+        function saveGameToHistory(result, winner) {
+            const gameData = {
+                date: new Date().toISOString(),
+                mode: gameState.gameMode,
+                difficulty: gameState.difficulty,
+                result: result,
+                winner: winner,
+                player1Name: gameState.player1Name,
+                player2Name: gameState.player2Name,
+                board: [...gameState.board]
+            };
+
+            gameState.games.unshift(gameData); // Add to beginning
+            
+            // Keep only last 50 games
+            if (gameState.games.length > 50) {
+                gameState.games = gameState.games.slice(0, 50);
+            }
+            
+            updateHistoryDisplay();
+        }
+
+        function resetGame() {
+            gameState.board = Array(9).fill('');
+            gameState.currentPlayer = 'X';
+            gameState.gameActive = true;
+            gameState.moveHistory = [];
+            
+            // Clear board
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.className = 'cell';
+            });
+            
+            // Clear message
+            document.getElementById('gameMessage').innerHTML = '';
+            
+            updateCurrentPlayerDisplay();
+        }
+
+        function undoMove() {
+            if (gameState.moveHistory.length === 0) return;
+            
+            const lastState = gameState.moveHistory.pop();
+            gameState.board = [...lastState.board];
+            gameState.currentPlayer = lastState.currentPlayer;
+            gameState.gameActive = true;
+            
+            // Update board display
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                cell.textContent = gameState.board[index] === 'X' ? '❌' : gameState.board[index] === 'O' ? '⭕' : '';
+                cell.className = 'cell';
+                if (gameState.board[index] !== '') {
+                    cell.classList.add(gameState.board[index].toLowerCase());
+                    cell.classList.add('taken');
+                }
+            });
+            
+            // Clear message
+            document.getElementById('gameMessage').innerHTML = '';
+            
+            updateCurrentPlayerDisplay();
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('wins').textContent = gameState.stats.wins;
+            document.getElementById('draws').textContent = gameState.stats.draws;
+            document.getElementById('losses').textContent = gameState.stats.losses;
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (gameState.games.length === 0) {
+                historyList.innerHTML = '<p>No games played yet. Start playing to see your history!</p>';
+                return;
+            }
+            
+            const historyHTML = gameState.games.map(game => {
+                const date = new Date(game.date).toLocaleDateString();
+                const time = new Date(game.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const resultClass = game.result;
+                const resultText = game.result === 'win' ? '🏆 Won' : 
+                                 game.result === 'lose' ? '😔 Lost' : '🤝 Draw';
+                const modeText = game.mode === 'computer' ? 
+                               `🤖 vs Computer (${game.difficulty})` : '👫 vs Player';
+                
+                return `
+                    <div class="history-item">
+                        <div>
+                            <div class="game-result ${resultClass}">${resultText}</div>
+                            <div style="font-size: 0.8rem; color: #718096;">${modeText}</div>
+                        </div>
+                        <div style="text-align: right; font-size: 0.8rem; color: #718096;">
+                            <div>${date}</div>
+                            <div>${time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            historyList.innerHTML = historyHTML;
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all game history?')) {
+                gameState.games = [];
+                updateHistoryDisplay();
+                saveData();
+            }
+        }
+
+        function showCelebration(type) {
+            const overlay = document.getElementById('celebrationOverlay');
+            overlay.innerHTML = '';
+            
+            const emojis = type === 'win' ? ['🎉', '🎊', '✨', '🌟', '🎈'] : ['🤝', '😊', '👏', '💫', '🌸'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    overlay.appendChild(confetti);
+                    
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.parentNode.removeChild(confetti);
+                        }
+                    }, 3500);
+                }, i * 100);
+            }
+        }
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            updateCurrentPlayerDisplay();
+        });
+    </script>
+</body>
+</html>
